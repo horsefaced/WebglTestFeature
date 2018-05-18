@@ -1,0 +1,20 @@
+extend layout
+
+block append scriptfile
+    script(src="//libs.cartocdn.com/cartodb.js/v3/3.11/cartodb.core.js")
+    script(src="/javascripts/lib/cesium-cartodb.js")
+    style(type='text/css').
+        .button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+
+block append content
+    .button
+        button#startMeasure Start Measure
+        button#measureArea Measure
+        button#endMeasure End Measure
+
+block script
+    script(src="/javascripts/cesium/measure.js")

@@ -1,0 +1,22 @@
+extend layout
+
+block append scriptfile
+    style(type='text/css').
+        .button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+
+block append content
+    .button
+        button#colorByHeight Color By Height
+        button#colorByArea Color By Area
+        button#colorByLatitude Color By Latitude
+        button#colorByDistance Color By Distance
+        button#colorByNameRegex Color By Name Regex
+        button#hideByHeight Hide By Height
+        button#find Find The Building
+
+block script
+    script(src="/javascripts/cesium/pick.js")
