@@ -12,6 +12,7 @@
         return subdomains[(x + y) % subdomains.length];
     };
     Cesium.CartoDBImageryProvider.prototype.requestImage = function (x, y, level) {
+        console.log('x:' + x + ',y:' + y + ',level:' + level);
         var url = this.url.replace('{s}', this.getCDNSubdomain(x, y)).replace('{z}', level).replace('{x}', x).replace('{y}', y);
         return Cesium.ImageryProvider.loadImage(this, url);
     };

@@ -75,63 +75,69 @@ const humanHeight = 16;
         if (pickedObject) {
             console.log(pickedObject);
         } else {
-            CameraFly(preDot, viewer, event);
+            CameraFly(viewer, event);
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-})();
 
-function CameraFly(preDot, viewer, event) {
-    let ray = viewer.camera.getPickRay(event.position);
-    let position = viewer.scene.globe.pick(ray, viewer.scene);
-    viewer.entities.add({
-        position: position,
-        point: {
-            pixelSize: 5,
-            color: Cesium.Color.LIME,
-            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-        },
-    });
-
-    position.z += humanHeight;
-
-    if (preDot) {
-        let directionV = Cesium.Cartesian3.subtract(position, preDot, new Cesium.Cartesian3());
-        Cesium.Cartesian3.normalize(directionV, directionV);
-
-        let up = Cesium.Ellipsoid.WGS84.geodeticSurfaceNormal(preDot);
-        let east = Cesium.Cartesian3.cross({ x: 0, y: 0, z: 1 }, up, new Cesium.Cartesian3());
-        let north = Cesium.Cartesian3.cross(up, east, new Cesium.Cartesian3());
-        let enu = new Cesium.Cartesian3();
-        let x = Cesium.Cartesian3.dot(directionV, east);
-        let y = Cesium.Cartesian3.dot(directionV, north);
-        let z = Cesium.Cartesian3.dot(directionV, up);
-
-        let angle = Math.atan2(x, y);
-        let pitch = Math.asin(z);
-
-        pitch += -20 / 180 * Math.PI;
-
-        viewer.camera.lookAt(position, new Cesium.HeadingPitchRange(angle, Cesium.Math.toRadians(0.0), 1.0));
-        viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-        // viewer.camera.flyTo({
-        //     destination: position,
-        //     orientation: {
-        //         heading: angle,
-        //         pitch: Cesium.Math.toRadians(0.0),
-        //         roll: 0.0
-        //     },
-        // });
-    } else {
-        viewer.camera.flyTo({
-            destination: position,
-            orientation: {
-                heading: Cesium.Math.toRadians(0.0),
-                pitch: Cesium.Math.toRadians(0.0),
-                roll: 0.0
+    function CameraFly(viewer, event) {
+        let ray = viewer.camera.getPickRay(event.position);
+        let position = viewer.scene.globe.pick(ray, viewer.scene);
+        viewer.entities.add({
+            position: position,
+            point: {
+                pixelSize: 5,
+                color: Cesium.Color.LIME,
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
             },
         });
+    
+        position.z += humanHeight;
+    
+        if (preDot) {
+            let directionV = Cesium.Cartesian3.subtract(position, preDot, new Cesium.Cartesian3());
+            Cesium.Cartesian3.normalize(directionV, directionV);
+    
+            let up = Cesium.Ellipsoid.WGS84.geodeticSurfaceNormal(preDot);
+            let east = Cesium.Cartesian3.cross({ x: 0, y: 0, z: 1 }, up, new Cesium.Cartesian3());
+            let north = Cesium.Cartesian3.cross(up, east, new Cesium.Cartesian3());
+            let enu = new Cesium.Cartesian3();
+            enu.x = Cesium.Cartesian3.dot(directionV, east);
+            enu.y = Cesium.Cartesian3.dot(directionV, north);
+            enu.z = Cesium.Cartesian3.dot(directionV, up);
+    
+            let x = Cesium.Cartesian3.dot(enu, new Cesium.Cartesian3(1, 0, 0));
+            let y = Cesium.Cartesian3.dot(enu, new Cesium.Cartesian3(0, 1, 0));
+            let z = Cesium.Cartesian3.dot(enu, new Cesium.Cartesian3(0, 0, 1));
+    
+            let angle = Math.atan2(x, y);
+            let pitch = Math.asin(z);
+    
+            angle += 0 / 180 * Math.PI;
+            pitch += -20 / 180 * Math.PI;
+    
+//            viewer.camera.lookAt(position, new Cesium.HeadingPitchRange(angle, pitch, 80));
+            //viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+            viewer.camera.flyTo({
+                destination: position,
+                orientation: {
+                    heading: angle,
+                    pitch: 0.0,
+                    roll: 0.0
+                },
+            });
+        } else {
+            viewer.camera.flyTo({
+                destination: position,
+                orientation: {
+                    heading: Cesium.Math.toRadians(0.0),
+                    pitch: Cesium.Math.toRadians(0.0),
+                    roll: 0.0
+                },
+            });
+        }
+    
+        preDot = position;
+    
     }
+})();
 
-    preDot = position;
-
-}
